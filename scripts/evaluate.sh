@@ -7,7 +7,7 @@ bash ./scripts/clean_caches.sh
 echo
 
 echo "--- CONFIGURING ANACONDA ---"
-source ~/miniconda3/etc/profile.d/conda.sh
+source ~/anaconda3/etc/profile.d/conda.sh
 echo
 
 bash ./scripts/evaluate_dopamine.sh

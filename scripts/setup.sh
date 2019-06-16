@@ -1,6 +1,6 @@
 echo "--- STARTING SETUP ---"
 # Init Miniconda in the script
-source ~/miniconda3/etc/profile.d/conda.sh
+source ~/anaconda3/etc/profile.d/conda.sh
 
 # Create environments
 echo "--- SETTING UP DOPAMINE ENVIRONMENT ---"
@@ -16,6 +16,6 @@ conda deactivate
 echo "--- SETTING UP RAY ENVIRONMENT ---"
 conda env create -f config/ray.yml
 conda activate ray-env
-pip install lib/ray-0.7.0-cp36-cp36m-manylinux1_x86_64.whl
+pip install lib/ray-0.8.0.dev1-cp37-cp37m-macosx_10_6_intel.whl
 conda deactivate
 echo "--- SETUP COMPLETED ---"
