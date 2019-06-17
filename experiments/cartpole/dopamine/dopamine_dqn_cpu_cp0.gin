@@ -6,10 +6,10 @@ import dopamine.agents.dqn.dqn_agent
 import dopamine.replay_memory.circular_replay_buffer
 import gin.tf.external_configurables
 
-DQNAgent.observation_shape = %gym_lib.CARTPOLE_OBSERVATION_SHAPE
+DQNAgent.observation_shape = (12, 16)
 DQNAgent.observation_dtype = %gym_lib.CARTPOLE_OBSERVATION_DTYPE
 DQNAgent.stack_size = %gym_lib.CARTPOLE_STACK_SIZE
-DQNAgent.network = @gym_lib.cartpole_dqn_network
+#DQNAgent.network = @gym_lib.cartpole_dqn_network
 DQNAgent.gamma = 0.99
 DQNAgent.update_horizon = 1
 DQNAgent.min_replay_history = 500
@@ -22,7 +22,7 @@ DQNAgent.optimizer = @tf.train.AdamOptimizer()
 tf.train.AdamOptimizer.learning_rate = 0.001
 tf.train.AdamOptimizer.epsilon = 0.0003125
 
-create_gym_environment.environment_name = 'CartPole'
+create_gym_environment.environment_name = 'indexer'
 create_gym_environment.version = 'v0'
 create_agent.agent_name = 'dqn'
 CheckpointRunner.create_environment_fn = @gym_lib.create_gym_environment

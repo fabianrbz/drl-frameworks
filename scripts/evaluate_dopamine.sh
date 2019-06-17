@@ -1,4 +1,4 @@
-source ~/miniconda3/etc/profile.d/conda.sh
+source ~/anaconda3/etc/profile.d/conda.sh
 
 echo "--- STARTING DOPAMINE EXPERIMENTS ---"
 conda activate dopamine-env

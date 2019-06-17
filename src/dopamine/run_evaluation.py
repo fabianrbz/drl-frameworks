@@ -31,7 +31,7 @@ import tensorflow as tf
 
 import os
 import time
-
+import indexer.envs.indexer_env
 
 flags.DEFINE_string('base_dir', None,
                     'Base directory to host all required sub-directories.')
