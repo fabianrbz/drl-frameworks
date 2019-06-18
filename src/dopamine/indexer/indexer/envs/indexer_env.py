@@ -45,7 +45,7 @@ class IndexerEnv(gym.Env):
     done = self.should_stop(action, state)
     if not done:
       if action >= self.columns:
-        column = self.column_name_to_matrix_col[action % self.columns]
+        column = self.matrix_col_to_column_name[action % self.columns]
         self.remove_virtual_index(column)
         state[0][column] = 0
       else:
@@ -115,6 +115,9 @@ class IndexerEnv(gym.Env):
         return True
       elif action < self.columns and self.MAX_INDEXES == np.array(matrix)[0].sum():
         print('You can\' create more indexes')
+        return True
+      elif action < self.columns and matrix[0][action] == 1:
+        print('There is already an index on that column')
         return True
       else:
         return False
