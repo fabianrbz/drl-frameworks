@@ -28,7 +28,8 @@ class IndexerEnv(gym.Env):
     self.columns = len(self.matrix_col_to_column_name.keys())
 
     self.rows = len(os.listdir(os.path.join(os.path.dirname(__file__), QUERIES_DIRECTORY))) + 2
-    self.N_DISCRETE_ACTIONS = self.columns * 2
+    # self.N_DISCRETE_ACTIONS = self.columns * 2
+    self.N_DISCRETE_ACTIONS = self.columns
     self.action_space = spaces.Discrete(self.N_DISCRETE_ACTIONS)
 
     self.initial_cost = self.calculate_cost(True)
