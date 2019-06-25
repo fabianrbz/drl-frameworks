@@ -28,9 +28,10 @@ class IndexerEnv(gym.Env):
     self.columns = len(self.matrix_col_to_column_name.keys())
 
     self.rows = len(os.listdir(os.path.join(os.path.dirname(__file__), QUERIES_DIRECTORY))) + 2
-    # self.N_DISCRETE_ACTIONS = self.columns * 2
-    self.N_DISCRETE_ACTIONS = self.columns
+    self.N_DISCRETE_ACTIONS = self.columns * 2
     self.action_space = spaces.Discrete(self.N_DISCRETE_ACTIONS)
+
+    self.existing_indexes = {}
 
     self.initial_cost = self.calculate_cost(True)
     self.current_cost = self.initial_cost
@@ -78,11 +79,14 @@ class IndexerEnv(gym.Env):
   def add_virtual_index(self, column):
     cursor = self.connection.cursor()
     cursor.execute(f"select * from hypopg_create_index('create index on lineitem ({column})');")
+    self.existing_indexes[column] =  cursor.fetchone()[0]
     cursor.close()
 
   def remove_virtual_index(self, column):
     cursor = self.connection.cursor()
-    cursor.execute(f"select * from hypopg_drop_index('create index on tpch ({column})');")
+    index = self.existing_indexes[column]
+    if index:
+      cursor.execute(f"select * from hypopg_drop_index('{index}');")
     cursor.close()
 
   def calculate_cost(self, initial = False):
