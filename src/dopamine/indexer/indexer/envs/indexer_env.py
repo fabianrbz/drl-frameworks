@@ -23,12 +23,13 @@ class IndexerEnv(gym.Env):
 
     self.build_columns_dictionary()
 
-    self.MAX_INDEXES = 3
+    self.MAX_INDEXES = 8
 
     self.columns = len(self.matrix_col_to_column_name.keys())
 
     self.rows = len(os.listdir(os.path.join(os.path.dirname(__file__), QUERIES_DIRECTORY))) + 2
-    self.N_DISCRETE_ACTIONS = self.columns * 2
+    self.N_DISCRETE_ACTIONS = self.columns
+    # self.N_DISCRETE_ACTIONS = self.columns * 2
     self.action_space = spaces.Discrete(self.N_DISCRETE_ACTIONS)
 
     self.existing_indexes = {}
