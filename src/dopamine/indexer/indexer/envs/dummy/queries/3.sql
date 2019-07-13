@@ -1,3 +1,3 @@
 select count(*)
 from lineitem
-where l_quantity = 1
+where l_shipdate =  '1992-04-05'

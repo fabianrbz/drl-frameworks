@@ -1,3 +1,1 @@
-select count(*)
-from lineitem
-where l_linenumber = 1
+select count(*) from lineitem where l_comment like 'Tiresias about the blithel%'

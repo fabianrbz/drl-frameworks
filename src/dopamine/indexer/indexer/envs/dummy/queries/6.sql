@@ -1,3 +1,3 @@
 select count(*)
 from lineitem
-where l_suppkey < 10000
+where l_suppkey <= 100

@@ -7,6 +7,7 @@ import sql_metadata
 import os
 import psycopg2
 import yaml
+import re
 
 SCHEMA = "resources/schema.sql"
 FOLDER = "dummy"
@@ -100,16 +101,17 @@ class IndexerEnv(gym.Env):
     else:
       queries = np.sort(os.listdir(os.path.join(os.path.dirname(__file__), QUERIES_DIRECTORY)))
       for index, query_file in enumerate(queries):
-        cursor.execute("explain analyze " + open(os.path.join(os.path.dirname(__file__), QUERIES_DIRECTORY + query_file), "r").read())
+        cursor.execute("explain " + open(os.path.join(os.path.dirname(__file__), QUERIES_DIRECTORY + query_file), "r").read())
         results = cursor.fetchall()
-        execution_time = float(results[-1][0].split()[2])
+        p = re.compile('\d+\.\d+')
+        res = p.search(results[1][0])
+        execution_time = float(res.group())
         cost += execution_time
 
     cursor.close()
     return cost
 
   def should_stop(self, action, matrix):
-    #TODO: check if there is an index for that column already
     if action >= self.N_DISCRETE_ACTIONS:
       print('Invalid column')
       return True

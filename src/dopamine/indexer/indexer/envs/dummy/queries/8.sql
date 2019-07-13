@@ -1,3 +1,3 @@
 select count(*)
 from lineitem
-where l_extendedprice < 50000
+where l_extendedprice = 50000
