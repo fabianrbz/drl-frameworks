@@ -4,6 +4,7 @@ echo "--- STARTING DOPAMINE EXPERIMENTS ---"
 conda activate dopamine-env
 echo
 echo "--- STARTING DOPAMINE CARTPOLE EXPERIMENTS ---"
+rm -rf results/cartpole/
 mkdir -p results/cartpole/runtime
 echo
 for fullfile in experiments/cartpole/dopamine/*.gin; do 
