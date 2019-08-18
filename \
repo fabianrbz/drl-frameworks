@@ -14,7 +14,6 @@ SCHEMA = "resources/schema.sql"
 FOLDER = "dummy"
 QUERIES_DIRECTORY = f"{FOLDER}/queries/"
 BEST_COST = 344568.11
-BEST_INDEXES = ['l_partkey', 'l_comment', 'l_shipdate', 'l_discount', 'l_suppkey', 'l_receiptdate', 'l_extendedprice', 'l_tax', 'l_orderkey']
 INITIAL = 18099161.35
 
 class IndexerEnv(gym.Env):
@@ -35,6 +34,7 @@ class IndexerEnv(gym.Env):
 
     self.rows = len(os.listdir(os.path.join(os.path.dirname(__file__), QUERIES_DIRECTORY))) + 2
     self.N_DISCRETE_ACTIONS = self.columns
+    # self.N_DISCRETE_ACTIONS = self.columns * 2
     self.action_space = spaces.Discrete(self.N_DISCRETE_ACTIONS)
 
     self.existing_indexes = {}
@@ -42,59 +42,49 @@ class IndexerEnv(gym.Env):
     self.initial_cost = INITIAL
     self.current_cost = self.initial_cost
 
-    for column in BEST_INDEXES:
-      print(self.column_name_to_matrix_col[column])
-      self.add_virtual_index(column)
-    self.best_cost = self.calculate_cost()
+    print('Initial')
+    print(INITIAL)
     print('BEST')
-    print(self.best_cost)
-
+    print(BEST_COST)
     self.state = None
     self.reset()
 
   def step(self, action):
     assert self.action_space.contains(action), "%r invalid"%(action)
     state = self.state
-    print(f"action {action}")
-
-    if action < self.columns and state[0][action] == 1:
-      print('There is already an index on that column\n')
-      pdb.set_trace()
 
     self.amount_of_steps += 1
-    if self.amount_of_steps > self.MAX_INDEXES:
-      done = True
+
+    # print(self.matrix_col_to_column_name[action])
+    done = self.should_stop(action, state)
+
+    if not done:
+      if action >= self.columns:
+        column = self.matrix_col_to_column_name[action % self.columns]
+        self.remove_virtual_index(column)
+        state[0][column] = 0
+      else:
+        self.add_virtual_index(self.matrix_col_to_column_name[action])
+        for x in range(self.rows):
+            state[x][action] = 1
+
+      # print('Cost!')
+      new_cost = self.calculate_cost()
+      print(new_cost)
+
+      if (new_cost > self.current_cost):
+        print('The cost is higher')
+        reward = self.calculate_reward(new_cost)
+      pdb.set_trace()
+        done = True
+      else:
+        reward = 1
+
+    else:
       new_cost = self.calculate_cost()
       self.current_cost = new_cost
+      pdb.set_trace()
       reward = self.calculate_reward(new_cost)
-    else:
-      done = self.should_stop(action, state)
-      if not done:
-        if action >= self.columns:
-          column = self.matrix_col_to_column_name[action % self.columns]
-          self.remove_virtual_index(column)
-          state[0][column] = 0
-        else:
-          self.add_virtual_index(self.matrix_col_to_column_name[action])
-          for x in range(self.rows):
-              state[x][action] = 1
-
-        new_cost = self.calculate_cost()
-
-        if (new_cost > self.current_cost):
-          print('The cost is higher')
-          reward = self.calculate_reward(new_cost)
-          done = True
-        elif new_cost == self.current_cost:
-          print('The cost is equal')
-          reward = self.calculate_reward(new_cost)
-          done = True
-        else:
-          reward = 1
-      else:
-        new_cost = self.calculate_cost()
-        self.current_cost = new_cost
-        reward = self.calculate_reward(new_cost)
 
     self.current_cost = new_cost
 
@@ -114,8 +104,8 @@ class IndexerEnv(gym.Env):
 
   def add_virtual_index(self, column):
     cursor = self.cursor
-    statement = f"select * from hypopg_create_index('create index on lineitem ({column})');"
-    cursor.execute(statement)
+    cursor.execute(f"select * from hypopg_create_index('create index on lineitem ({column})');")
+    # pdb.set_trace()
     self.existing_indexes[column] =  cursor.fetchone()[0]
 
   def remove_virtual_index(self, column):
@@ -138,8 +128,9 @@ class IndexerEnv(gym.Env):
         results = cursor.fetchall()
         p = re.compile('\d+\.\d+')
         res = p.search(results[0][0])
+        # if not initial:
+            # pdb.set_trace()
         execution_time = float(res.group())
-        print(f"query: {index}  execution_time: {execution_time}")
         cost += execution_time
 
     return cost
@@ -158,7 +149,7 @@ class IndexerEnv(gym.Env):
         print('You can\' create more indexes')
         return True
       elif action < self.columns and matrix[0][action] == 1:
-        print('There is already an index on that column\n')
+        print('There is already an index on that column')
         return True
       else:
         return False
@@ -236,12 +227,8 @@ class IndexerEnv(gym.Env):
     return selectivities
 
   def calculate_reward(self, current_cost):
-    numerator = current_cost - INITIAL
-    denominator = self.best_cost - INITIAL
-    print(f"current cost {current_cost}")
-    print(f"best cost {self.best_cost}")
-    print(f"best/current {self.best_cost/current_cost}")
-    print(f"current/best {current_cost/self.best_cost}")
-    print(f"reward {(numerator/denominator) * 100}")
-    #calcular a mano el costo de lo q me tira la mierda esta a ver si esta bien...
-    return (numerator/denominator) * 100 - self.amount_of_steps
+    value_initial = 1/INITIAL
+    value_best = 1/BEST_COST
+    numerator = max((1/current_cost - value_initial), 0)
+    # return (numerator/(value_best - value_initial)) * 100# - self.amount_of_steps
+    return 1/current_cost
