@@ -20,11 +20,13 @@ class CustomDQNTrainer(dqn.DQNTrainer):
         ep_count = 0
         rew_sum = 0
         steps = 0
-        self.evaluation_ev.restore(self.local_evaluator.save())
-        self.evaluation_ev.foreach_policy(lambda p, _: p.set_epsilon(0))
+
+        self._before_evaluate()
+        self.evaluation_workers.local_worker().restore(self.workers.local_worker().save())
+
         while steps < self.config["timesteps_per_iteration"]:
-            self.evaluation_ev.sample()
-            eval_result = collect_metrics(self.evaluation_ev)
+            self.evaluation_workers.local_worker().sample()
+            eval_result = collect_metrics(self.evaluation_workers.local_worker())
             ep_count += 1
             rew_sum += eval_result["episode_reward_mean"]
             steps += eval_result["episode_len_mean"]
@@ -46,6 +48,7 @@ class CustomPPOTrainer(ppo.PPOTrainer):
 
     def __init__(self, config=None, env=None, logger_creator=None, ts_per_iter=1000):
         self.timesteps_per_iteration = ts_per_iter
+        print(env)
         super().__init__(config, env, logger_creator)
 
     @override(ppo.PPOTrainer)

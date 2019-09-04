@@ -158,7 +158,7 @@ def main(args):
             str(end_time - start_time) + '\n')
     f.close()
 
-    # inference testing
+    # inference (evaluation) testing
     try:
         num_inference_steps = params["run_details"]["num_inference_steps"]
         if num_inference_steps:

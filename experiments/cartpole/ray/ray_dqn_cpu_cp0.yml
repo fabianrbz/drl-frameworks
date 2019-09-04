@@ -1,23 +1,29 @@
 ray_dqn_cpu_cp0:
   run: DQN
-  env: CartPole-v0
-  local_dir: "results/cartpole" 
+  env: IndexerEnv
+  local_dir: "results/cartpole"
   checkpoint_freq: 0
-  checkpoint_at_end: False 
+  checkpoint_at_end: False
   inference_steps: 500000
   # number of iterations
   stop:
-    training_iteration: 5
+    training_iteration: 50
   # all other hyperparameters (e.g. length of one iteration)
   config:
     adam_epsilon: 0.0003125
+    learning_starts: 0
     buffer_size: 50000
     dueling: False
     double_q: False
     # we want to evaluate manually, but still need the evaluator
-    evaluation_interval: 1000000
-    lr: 0.001
+    #evaluation_interval: 1000000
+    evaluation_num_episodes: 1
+    lr: 0.0001
     num_workers: 0
     prioritized_replay: False
-    timesteps_per_iteration: 1000
+    timesteps_per_iteration: 2000
+    target_network_update_freq: 4000
     train_batch_size: 128
+    hiddens: []
+    model:
+      custom_model: 'my_model'

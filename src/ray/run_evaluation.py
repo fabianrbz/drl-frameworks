@@ -12,8 +12,25 @@ import yaml
 
 import ray
 from ray.tune.config_parser import make_parser
+from ray.tune.registry import register_env
+from indexer_env import IndexerEnv
+from indexer_env2 import IndexerEnv2
 
-from custom_trainer import get_agent_class
+from custom_trainer import CustomDQNTrainer
+from my_model_class import MyModelClass
+from ray.rllib.models import ModelCatalog
+import gym
+from gym import error, spaces, utils
+from gym.utils import seeding
+import numpy as np
+import re
+import sql_metadata
+import os
+import psycopg2
+import yaml
+import re
+import pdb
+
 
 EXAMPLE_USAGE = """
 Training example via RLlib CLI:
@@ -43,6 +60,7 @@ class Tensorboard:
         self.writer.flush()
 
 
+# extracted from rlib/train.py
 def create_parser(parser_creator=None):
     """ Creates argument parser."""
     parser = make_parser(
@@ -71,8 +89,8 @@ def run(args, parser):
     experiment_name = list(experiments.keys())[0]
     experiment_info = list(experiments.values())[0]
 
+    print(experiment_info)
     agent_name = experiment_info["run"]
-    env_name = experiment_info["env"]
     results_dir = experiment_info['local_dir']
     checkpoint_freq = experiment_info["checkpoint_freq"]
     checkpoint_at_end = experiment_info["checkpoint_at_end"]
@@ -80,15 +98,16 @@ def run(args, parser):
     num_iterations = experiment_info["stop"]["training_iteration"]
     config = experiment_info["config"]
 
+    # register model
+    ModelCatalog.register_custom_model("my_model", MyModelClass)
+
     # init training agent
-    ray.init()
-    agent_class = get_agent_class(agent_name)
-    if agent_name == "DQN":
-        agent = agent_class(env=env_name, config=config)
-    elif agent_name == "PPO":
-        ts_per_iter = experiment_info["agent_timesteps_per_iteration"]
-        agent = agent_class(env=env_name, config=config,
-                            ts_per_iter=ts_per_iter)
+    ray.init(object_store_memory=1024*1024*1024)
+
+    register_env("IndexerEnv", lambda _: IndexerEnv())
+    register_env("IndexerEnv2", lambda _: IndexerEnv2())
+
+    agent = CustomDQNTrainer(env=IndexerEnv2, config=config)
 
     average_reward_train, train_episodes = [], []
     average_reward_eval, eval_episodes = [], []

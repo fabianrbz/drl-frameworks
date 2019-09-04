@@ -22,7 +22,6 @@ ray_rainbow_gpu_cp0:
     learning_starts: 1000
     lr: .09
     noisy: False
-    num_atoms: 51
     num_cpus_for_driver: 0
     num_gpus: 1
     num_workers: 0

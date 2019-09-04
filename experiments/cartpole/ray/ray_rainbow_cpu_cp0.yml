@@ -22,7 +22,6 @@ ray_rainbow_cpu_cp0:
     learning_starts: 1000
     lr: .09
     noisy: False
-    num_atoms: 51
     num_workers: 0
     n_step: 3
     prioritized_replay: True
