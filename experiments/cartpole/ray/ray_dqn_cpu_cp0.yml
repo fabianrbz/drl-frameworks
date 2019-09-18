@@ -7,7 +7,7 @@ ray_dqn_cpu_cp0:
   inference_steps: 500000
   # number of iterations
   stop:
-    training_iteration: 50
+    training_iteration: 500
   # all other hyperparameters (e.g. length of one iteration)
   config:
     adam_epsilon: 0.0003125
@@ -16,7 +16,7 @@ ray_dqn_cpu_cp0:
     dueling: False
     double_q: False
     # we want to evaluate manually, but still need the evaluator
-    #evaluation_interval: 1000000
+    evaluation_interval: 5000
     evaluation_num_episodes: 1
     lr: 0.0001
     num_workers: 0
