@@ -14,26 +14,11 @@ class MyModelClass(DistributionalQModel, TFModelV2):
     def __init__(self, obs_space, action_space, num_outputs, model_config, name, **kw):
       super(MyModelClass, self).__init__(obs_space, action_space, num_outputs, model_config, name, **kw)
 
-      # inputs   = tf.keras.layers.Input(shape=(12, 16), name="input")
-      # layer_1  = tf.keras.layers.Conv2D(32, kernel_size=4, name="conv1")(inputs)
-      # layer_2  = tf.keras.layers.Conv2D(64, kernel_size=4, name="conv2")(layer_1)
-      # layer_3  = tf.keras.layers.Conv2D(64, kernel_size=4, name="conv3")(layer_2)
-      # flat     = tf.keras.layers.Flatten()(layer_3)
-      # output   = tf.keras.layers.Dense(512)(inputs)
-      # q_values = tf.keras.layers.Dense(num_outputs)(output)
-
-      # self.base_model = tf.keras.Model(inputs, [output, q_values])
-
       self.base_model = FullyConnectedNetwork(
               spaces.Box(low=-np.finfo(np.float32).max, high=np.finfo(np.float32).max, shape=(192,)),
               action_space, 16,
               model_config, name)
       self.register_variables(self.base_model.variables())
-      # self.inputs   = tf.keras.layers.Input(shape=(192,), name="input")
-      # output   = tf.keras.layers.Dense(16, activation=tf.nn.relu, kernel_initializer=normc_initializer(1.0))(self.inputs)
-      # self.base_model = tf.keras.Model(self.inputs, [output])
-      # print(self.base_model.summary())
-      # self.register_variables(self.base_model.variables)
 
     def forward(self, input_dict, state, seq_lens):
         # Extract the available actions tensor from the observation.
