@@ -32,6 +32,7 @@ import tensorflow as tf
 import os
 import time
 import indexer.envs.indexer_env
+import pdb
 
 flags.DEFINE_string('base_dir', None,
                     'Base directory to host all required sub-directories.')
@@ -67,7 +68,7 @@ def main(unused_argv):
     runner.run_experiment()
     end_time = time.time()
 
-    f = open(runtime_file, 'a+')
+    f = open(runtime_file, 'w+')
     f.write(experiment_name + ', ' + str(end_time - start_time) + '\n')
     f.close()
 

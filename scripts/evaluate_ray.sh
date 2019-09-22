@@ -18,7 +18,7 @@ echo
 
 echo "--- STARTING EXPERIMENT  --- "
 bash ./scripts/clean_caches.sh
-python src/ray/run_evaluation.py -f="experiments/cartpole/ray/ray_dqn_cpu_cp0.yml"
+python src/ray/run_evaluation.py -f="experiments/cartpole/ray/ray_rainbow_cpu_cp0.yml"
 echo "--- EXPERIMENT  COMPLETED --- "
 
 echo "--- RAY CARTPOLE EXPERIMENTS COMPLETED ---"
